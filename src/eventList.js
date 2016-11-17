@@ -94,7 +94,7 @@ EventList.prototype.insertAfter = function( afterThisNode, eventNotice ) {
 
 	// Assertion
 	// TODO: Think about same time stuff
-	if ( eventNotice.time <= afterThisNode ) {
+	if ( eventNotice.time < afterThisNode ) {
 		Console.log( "Error: Trying to insert node in wrong order." );
 	}
 
@@ -138,7 +138,7 @@ EventList.prototype.remove = function( ) {
 
 	ret.clearAllReferences();
 
-	return ret
+	return ret;
 
 };
 
@@ -161,6 +161,7 @@ var HenNode = function(eventNotice,
 }
 
 // clears only this eventPointer (will be called from outside)
+// NOTE regarding the clearing of times: see clearBothReferences note section.
 HenNode.prototype.clearReference = function() {
 
 	this.eventPointer = null;
@@ -168,7 +169,10 @@ HenNode.prototype.clearReference = function() {
 };
 
 // clears both references of HenNode and EventNotice. Will be calles from inside here.
-HenNode.prototype.clearBothReferences = function() {
+// NOTE: times are not being removed from the tree, as they are necessary for not 
+//       being selected in the future. In other words: the algorithm is likely to break 
+//       if there are *no* times present.
+HenNode.prototype.clearBothReferences = function( ) {
 
 	this.eventPointer.clearReference( this );
 	this.eventPointer = null;
@@ -177,9 +181,9 @@ HenNode.prototype.clearBothReferences = function() {
 
 
 
-HenNode.prototype.isLeaf = function() {
+HenNode.prototype.isLeaf = function( ) {
 
-	return this.leftSon === null || this.rightSon === null
+	return this.leftSon === null || this.rightSon === null;
 
 };
 
@@ -189,7 +193,7 @@ HenNode.prototype.isLeaf = function() {
 /* ~~~~ HENTREE ~~~~ */
 /* ################# */
 
-var HenTree = function(maxNotice) {
+var HenTree = function( maxNotice ) {
 
 	this.root = new HenNode(maxNotice);
 
@@ -214,8 +218,6 @@ HenTree.prototype.addLayer = function(minNotice, maxNotice) {
 		currentNode.rightSon = new HenNode( minNotice );
 
 	}
-
-
 
 	// for that purpose create an array with the infix notation of the tree
 	var infix = [];
@@ -294,7 +296,7 @@ HenTree.prototype.getNoNodes = function( ) {
 		sum += this.getNoNodes( lvl );
 	}
 
-	return sum
+	return sum;
 
 };
 
@@ -344,14 +346,78 @@ HenTree.prototype.getLeafs = function() {
 
 };
 
-
+// TODO: test...
+// returns the HenNode that is the one with a time that is the smallest 
+// one yet still greater than the input time. Important to return the
+// complete HenNode, since we may need it for finding the lext lower node
+// in order to perform a pull operation.
 HenTree.prototype.getSmallestGreater = function( time ) {
 	
-	// TODO: 
-	 
+	var currentNode = this.root;
+	var candidate = null;
+	var notFound = true;
+
+	// TODO: think about the situation that eventPointer are null or point to a 
+	//       thing that is not in order!! maybe due to deletion before they point 
+	//       to the plus infty thing...
+	// --> I dont think that this is a realistic thing to happen. But being not
+	//     completely sure about that, i will leave that here.
+	
+	// TODO: think about leq stuff
+	while ( notFound ) {
+
+		if ( currentNode.time <= time ) {
+			
+			if ( currentNode.isLeaf() ){
+				notFound = false;
+			} else {
+				currentNode = currentNode.rightSon;	
+			}
+			
+		} else {
+
+			if (candidate == null || (candidate.time > currentNode.time && currentNode.time > time)) {
+				candidate = currentNode	
+			}
+			
+			// try to approach a more smaller but still greater value compared to time.
+			if ( currentNode.isLeaf() ){
+				notFound = false;
+			} else {
+				currentNode = currentNode.leftSon;
+			}
+
+		}
+
+	}
+
+	return candidate;
 
 };
 
+// GLOBAL TODO: maybe create funciton for setting hennode to certain eventnotice...!?
+
+// performs a pull operation, given a Hennode that has lead to a non failed insert 
+// because the maximum search iteration was reached. The toEventNotice is the Eventnotice the lower hennode must point to.
+// true will be returned when the pull operation was successful.
+// it is not successful when the next lower node is null. In this case false is returned.
+HenTree.prototype.pull = function( originHenNode, toEventNotice ) {
+	
+	var lowerNode = originHenNode.nextLowerNode;
+	if (lowerNode === null) {
+		return null;
+	}
+
+	lowerNode.clearBothReferences();
+	lowerNode.eventPointer = toEventNotice;
+	toEventNotice.externalReferences.push( lowerNode );
+
+	return lowerNode;
+
+};
+
+
+// GLOBAL TODO: if times are equal make it FIFO!!!
 
 
 
@@ -361,21 +427,51 @@ HenTree.prototype.getSmallestGreater = function( time ) {
 
 var HenAlgorithm = function() {
 
+	// create EventList
+	this.eventList = new EventList();
+
 	// TODO: create HenTree
-	// TODO: create EventList
-	// TODO: create MAXSEARCH CONST here
+	this.henTree = new HenTree(evetnList.tail);
 
 }
 
-// TODO: make MAXSEARCH variable to 4
+HenAlgorithm.prototype.MAXSEARCH = 4;
+
 
 HenAlgorithm.prototype.insert = function( eventNotice ) {
-	// TODO: assert that time is greater than current!
-	// TODO: 
+	
+	// TODO: assert that time is greater than current! (first...add it later to be able to work as a fifo simply.)
+	var smallestGreaterNode = this.HenNode.getSmallestGreater( eventNotice.time );
+	var resultInsert = this.tryInsert( eventNotice, smallestGreaterNode, this.MAXSEARCH );
+	if ( resultInsert === null ) {
+
+		return;
+
+	} else {
+		
+		// perform pull operation. 
+		var pullResult = this.henTree.pull( smallestGreaterNode, resultInsert );
+		if ( pullResult === null ) {
+
+			// add new layer and insert again
+			this.henTree.addLayer( this.eventList.head, this.eventList.tail );
+			// TODO: is this working? It should only call insert once hereafter.
+			this.insert( eventNotice );
+
+		} else {
+
+			// try to insert the eventNotice from the nextLower node now.
+			this.eventList.tryInsert( eventNotice, pullResult, this.MAXSEARCH );
+
+		}
+
+	}
+	
 };
 
 HenAlgorithm.prototype.next = function() {
 	// TODO: 
+	
 };
 
 HenAlgorithm.prototype.pull = function( node ) {
