@@ -12,6 +12,34 @@ var EventNotice = function( time, data=null ) {
 
 };
 
+// clears all references to and from(!) other nodes and notices. Will be called from inside here.
+EventNotice.prototype.clearAllReferences = function( ) {
+	
+	// clear references for garbage purposes
+	ret.next = null;
+	ret.prev = null;
+	for (var i = 0; i <= this.externalReferences.length; i++) {
+		this.externalReferences[i].clearReference();
+		this.externalReferences[i] = null
+	}
+
+};
+
+
+// TODO: Does that find the HenNodes? IndexOf?
+// Clears the reference to a particular HenNode. Will be called from outside.
+EventNotice.prototype.clearReference = function( henNode ) {
+	
+	var index = this.externalReferences.indexOf(henNode);
+	if (index > -1) {
+	    array.splice(index, 1);
+	} else {
+		Console.log("Error: cannot find henNode in external References. This is a big internal error!")
+	}
+
+};
+
+
 
 
 
@@ -34,20 +62,38 @@ var EventList = function() {
 	this.head.next = tail;
 	this.tail.prev = head;
 
+	this.noOfElements = 0;
+
 };
 
-EventList.prototype.tryInsert = function( eventNotice ) {
-	
-	// TODO: method that goes 4 steps to left from event notice 
-	// 		 and calls insertAfter(->ret:null) if OK. If not ok make 
-	// 		 pull(not really just return that node. Pull will handle 
-	// 		 if new layer of tree is needed) (->ret:eventnotice). 
+// It will try to insert with maxsearch amount of lookups. if successful null will be returned. 
+// If not successful the last watched node will be returned in order to perform a pull operation.
+EventList.prototype.tryInsert = function( what, start, maxSearch ) {
+    
+    var currentNotice = start.prev;
+
+    // TODO: check amount of iterations if it is correct.
+    for (var i = 0; i <= maxSearch; i++) {
+
+    	// TODO: Think about same time stuff
+    	if (currentNotice === null || currentNotice.time <= what.time) {
+    		// so we reached the very first border node (-infty)
+    		insertAfter (currentNotice, what)
+    		return null;
+    	}
+
+	    currentNotice = currentNotice.prev;
+
+    }
+
+    return currentNode;
 
 };
 
 EventList.prototype.insertAfter = function( afterThisNode, eventNotice ) {
 
 	// Assertion
+	// TODO: Think about same time stuff
 	if ( eventNotice.time <= afterThisNode ) {
 		Console.log( "Error: Trying to insert node in wrong order." );
 	}
@@ -55,14 +101,15 @@ EventList.prototype.insertAfter = function( afterThisNode, eventNotice ) {
 	eventNotice.next   = afterThisNode.next;
 	afterThisNode.next = eventNotice;
 	eventNotice.prev   = afterThisNode;
+	this.noOfElements++;
 
 };
 
 
 EventList.prototype.next = function() {
 
-	if ( isEmpty() ) {
-		Console.log("Error: Liste ist leer!");
+	if ( this.isEmpty() ) {
+		Console.log("Error: List is empty!");
 		return null;
 	}
 
@@ -73,12 +120,27 @@ EventList.prototype.next = function() {
 
 };
 
-// TODO:
+
 EventList.prototype.isEmpty = function( ) {
-	
+	return this.noOfElements == 0;
 };
 
 
+// Removes the most imminent element from the EventList, unless the list is empty. 
+// It will return the EventNotice wihtout any in or outgoing references.
+EventList.prototype.remove = function( ) {
+	if (this.isEmpty()) {
+		Console.log("Error: Cannot remove element of an empty list.")
+	}
+	ret = this.head.next;
+	this.head.next = ret.next;
+	reat.next.prev = this.head;
+
+	ret.clearAllReferences();
+
+	return ret
+
+};
 
 
 /* ################# */
@@ -98,10 +160,17 @@ var HenNode = function(eventNotice,
 
 }
 
-
-// TODO: OK? where do i need to call?
+// clears only this eventPointer (will be called from outside)
 HenNode.prototype.clearReference = function() {
 
+	this.eventPointer = null;
+
+};
+
+// clears both references of HenNode and EventNotice. Will be calles from inside here.
+HenNode.prototype.clearBothReferences = function() {
+
+	this.eventPointer.clearReference( this );
 	this.eventPointer = null;
 
 };
@@ -110,7 +179,7 @@ HenNode.prototype.clearReference = function() {
 
 HenNode.prototype.isLeaf = function() {
 
-	return this.leftSon == null || this.rightSon == null
+	return this.leftSon === null || this.rightSon === null
 
 };
 
@@ -159,13 +228,13 @@ HenTree.prototype.addLayer = function(minNotice, maxNotice) {
 	while ( true ) {
 
 		// 3) Push the current node to S and set current = current->left until current is NULL
-		while ( currentNode != null ) {
+		while ( currentNode !== null ) {
 			stack.push( currentNode );
 			currentNode = currentNode.leftSon;
 		}
 
 		// 4) If current is NULL and stack is not empty then 
-		if ( currentNode == null && stack.length != 0 ) {
+		if ( currentNode === null && stack.length != 0 ) {
 			
 			// a) Pop the top item from stack and add it to result
 			tmpNode = stack.pop();
@@ -177,7 +246,7 @@ HenTree.prototype.addLayer = function(minNotice, maxNotice) {
 		}
 		
 		// 5) If current is NULL and stack is empty then we are done.
-		if ( currentNode == null && stack.length == 0 ){
+		if ( currentNode === null && stack.length == 0 ){
 			break;
 		}
 		
@@ -224,7 +293,7 @@ HenTree.prototype.getNoNodes = function( ) {
 	for (var lvl = 0; lvl > height; lvl++) {
 		sum += this.getNoNodes( lvl );
 	}
-	
+
 	return sum
 
 };
@@ -294,6 +363,7 @@ var HenAlgorithm = function() {
 
 	// TODO: create HenTree
 	// TODO: create EventList
+	// TODO: create MAXSEARCH CONST here
 
 }
 
