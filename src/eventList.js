@@ -38,7 +38,10 @@ var EventList = function() {
 
 EventList.prototype.tryInsert = function( eventNotice ) {
 	
-	// TODO: method that goes 4 steps to left from event notice and calls insertAfter(->ret:null) if OK. If not ok make pull(not really just return that node. Pull will handle if new layer of tree is needed) (->ret:eventnotice). 
+	// TODO: method that goes 4 steps to left from event notice 
+	// 		 and calls insertAfter(->ret:null) if OK. If not ok make 
+	// 		 pull(not really just return that node. Pull will handle 
+	// 		 if new layer of tree is needed) (->ret:eventnotice). 
 
 };
 
@@ -96,7 +99,7 @@ var HenNode = function(eventNotice,
 }
 
 
-// TODO: OK? wher do i need to call?
+// TODO: OK? where do i need to call?
 HenNode.prototype.clearReference = function() {
 
 	this.eventPointer = null;
@@ -181,7 +184,7 @@ HenTree.prototype.addLayer = function(minNotice, maxNotice) {
 	}
 
 
-	// now reconfigure the "nextLoverNode" pointer of the tree
+	// now reconfigure the nextLowerNode pointer of the tree
 	for ( var i = infix.length - 1; i > 0; i-- ) {
 		infix[ i ].lowerNode = infix[ i-1 ];
 	}
@@ -195,7 +198,10 @@ HenTree.prototype.getHeight = function() {
 	
 	var cnt;
 	var currentNode = this.root;
-	for (cnt = 1; ! this.root.isLeaf(); cnt++) {}
+	for (cnt = 1; ! currentNode.isLeaf(); cnt++) {
+		currentNode = currentNode.leftSon;
+	}
+
 	return cnt;
 
 };
@@ -215,9 +221,10 @@ HenTree.prototype.getNoNodes = function( ) {
 	
 	var height = this.getHeight();
 	var sum = 0;
-	for (var lvl = 0; lvl >height; lvl++) {
+	for (var lvl = 0; lvl > height; lvl++) {
 		sum += this.getNoNodes( lvl );
 	}
+	
 	return sum
 
 };
@@ -320,3 +327,4 @@ HenAlgorithm.prototype.addLayer = function( ) {
 HenAlgorithm.prototype.toString = function( ) {
 	// TODO: return debugging visualisation of tree and list
 };
+
