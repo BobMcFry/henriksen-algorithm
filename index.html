@@ -10,47 +10,108 @@
   </head>
   <body onload="initialize();">
 
+  <div id="debugCon" style="font-family:Consolas,Monaco,Lucida Console,Courier New, monospace;">
+    
+    <!-- <textarea id="debugCon" readonly style="width: 100%; height: 100%; font-family:Consolas,Monaco,Lucida Console,Courier New, monospace;"> -->
+    <!-- </textarea>  -->
+
+  </div>
+
     <script src="src/eventList.js"></script>
+    <script src="src/output.js"></script>
+    <script type="text/javascript" src="bower_components/jquery/dist/jquery.slim.min.js"></script>
+    <script type="text/javascript" src="bower_components/sprintf/dist/sprintf.min.js"></script>
     <script type="text/javascript">
+
       function initialize() {
         var algo = new HenAlgorithm();
-        algo.insert(1);
-        algo.toString();
-        algo.insert(2);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
-        algo.insert(6);
-        algo.toString();
-        algo.insert(3);
-        algo.toString();
-        algo.insert(4);
-        algo.toString();
-        algo.insert(10);
-        algo.toString();
-        algo.insert(9);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
-        algo.insert(1.5);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
-        console.log("Popped: " + algo.next().time);
-        algo.toString();
+        var drawy = new HenAlgorithmOut(algo);
+        var values = [];
+        for (var i = 0; i < 32; i++) {
+          values.push(i);
+        }
+
+        values = shuffle(values);
+
+        console.log(values);
+        for (var i = 0; i < values.length; i++) {
+          algo.insert(values[i]);
+          debugCon("Inserted: " + values[i], drawy.getStringRepresentation());
+        }
+
+        
+
+        // algo.insert(1);
+        // algo.toString();
+        // algo.insert(2);
+        // algo.toString();
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // algo.insert(6);
+        // algo.toString();
+        // algo.insert(3);
+        // algo.toString();
+        // algo.insert(4);
+        // algo.toString();
+        // algo.insert(10);
+        // algo.toString();
+        // algo.insert(9);
+        // algo.toString();
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // algo.insert(1.5);
+        // algo.toString();
+        // debugCon(drawy.getStringRepresentation());
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // console.log("Popped: " + algo.next().time);
+        // algo.toString();
+        // console.log(sprintf("%10s This is just a test.", "Hello"));
       }
 
-      function logg (string){
-        // console.log(string);
+      function logg (obj){
+        // console.log(obj);
+        // debugCon(obj);
       }
+
+      var debugCnt = 1;
+      function debugCon (title, obj){
+        // $('#debugCon').text($('#debugCon').text() + obj);
+        // $('#debugCon').text($('#debugCon').text() + "<b>");
+        $('#debugCon').append("<p>"+ (debugCnt++) + ": "  +title +  "</p>");
+        $('#debugCon').append("<pre>"+obj+ "</pre>");
+      }
+
+
+      // taken from: http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
+      function shuffle(array) {
+        let counter = array.length;
+
+        // While there are elements in the array
+        while (counter > 0) {
+            // Pick a random index
+            let index = Math.floor(Math.random() * counter);
+
+            // Decrease counter by 1
+            counter--;
+
+            // And swap the last element with it
+            let temp = array[counter];
+            array[counter] = array[index];
+            array[index] = temp;
+        }
+
+        return array;
+      }
+
     </script>
   </body>
 </html>

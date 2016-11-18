@@ -306,28 +306,29 @@ HenTree.prototype.getNodes = function( lvl ) {
 		console.log("Error: depth to high for tree!");
 		return null;
 	}
-
+	console.log("Ok Start");
 	var nodes = [];
 	var neededNodes = this.getNoNodesOnLvl( lvl );
 	var queue = [];
 	queue.push( this.root );
-	var currentLvl = -1;
+	var currentLvl = 0;
 	while ( nodes.length != neededNodes ) {
-		
-		// If queue holds as many items of next row then update level
-		if ( queue.length == this.getNoNodesOnLvl( lvl ) ) {
-			currentLvl++;
-		}
 
 		// get next node from queue
 		currentNode = queue.shift();
+		console.log("lvl: "+currentLvl + " -> " +currentNode);
 
 		// if we reached our final level, pack this node into the return array
 		if ( currentLvl == lvl ) {
 			nodes.push( currentNode );
 		} else { // else add nodes for further processig
 			queue.push( currentNode.leftSon );
-			queue.push( currentNode.rightSon );
+			queue.push( currentNode.rightSon );	
+		}
+
+		// If queue holds as many items of next row then update level
+		if (queue.length == this.getNoNodesOnLvl( currentLvl+1 ) ) {
+			currentLvl++;
 		}
 
 	}
@@ -541,7 +542,7 @@ HenAlgorithm.prototype.tryInsert = function( what, start, maxSearch ) {
 HenAlgorithm.prototype.toString = function( ) {
 
 	// return debugging visualisation of tree and list
-	console.log(this.getListOfEventTimes());
+	this.getListOfEventTimes();
 
 };
 
