@@ -27,16 +27,21 @@
         var algo = new HenAlgorithm();
         var drawy = new HenAlgorithmOut(algo);
         var values = [];
-        for (var i = 0; i < 32; i++) {
+        for (var i = 0; i < 100; i++) {
           values.push(i);
         }
 
         values = shuffle(values);
 
-        console.log(values);
-        for (var i = 0; i < values.length; i++) {
+        // for (var i = 0; i < values.length; i++) {
+        for (var i = values.length-1; i >= 0; i--) {
           algo.insert(values[i]);
           debugCon("Inserted: " + values[i], drawy.getStringRepresentation());
+          // Removal
+          // if (!algo.isEmpty() && Math.random() > 0.7) {
+          //   var next = algo.next();
+          //   debugCon("Removed: " + next.time, drawy.getStringRepresentation());
+          // }
         }
 
         

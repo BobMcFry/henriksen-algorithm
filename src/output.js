@@ -2,11 +2,6 @@
 /* ~~~~ HENTREE_OUT ~~~~ */
 /* ##################### */
 
-//    4
-//  2   6
-// 1 3 5 7
-
-
 var HenTreeOut = function( henAlgorithm ) {
 
 	this.henAlgorithm = henAlgorithm;
@@ -21,7 +16,6 @@ HenTreeOut.prototype.getTree = function( ) {
 	for (var lvl = 0; lvl < height; lvl++) {
 		nodes.push(tree.getNodes(lvl));
 	}
-	console.log(nodes);
 	return nodes;
 
 };
@@ -30,8 +24,6 @@ HenTreeOut.prototype.getTree = function( ) {
 /* ################## */
 /* ~~~~ LIST_OUT ~~~~ */
 /* ################## */
-
-// . O O O O O O O O O O O O O O O O O O O O O O O O O O O O .
 
 var ListOut = function( henAlgorithm ) {
 
@@ -79,40 +71,33 @@ HenAlgorithmOut.prototype.getStringRepresentation = function() {
 	var height = tree.length;
 	var noOfLeafs = tree[height-1].length;
 	var treeWidth = noOfLeafs * this.NODESPACE + (noOfLeafs - 1) * this.BOTTOMSPACE;
-	// console.log(noOfLeafs);
 	var space;
 
 	for (var lvl = 0; lvl < height; lvl++) {
 
-		// calculate space between nodes
-		// space = treeWidth - (tree[lvl].length * this.NODESPACE);
-		// space /= (tree[lvl].length+1);
 		space = (treeWidth-(tree[lvl].length * this.NODESPACE)) / (tree[lvl].length);
 
 		// add half before first
 		string += this.getSpaceString((1/2) * space);
-		// string += this.getSpaceString(space);
 
 		// print nodes with complete space between
 		for (var i = 0; i < tree[lvl].length; i++) {
 			// TODO: make this sprintf dependent on NODESPACE!
-			if (tree[lvl][i].time < Number.MIN_VALUE*1.5) {
+			if (tree[lvl][i].time < this.henAlgo.eventList.MIN_VALUE*0.5) {
 				string += sprintf("%5s", "[-]");
-			} else if (tree[lvl][i].time > Number.MAX_VALUE*0.5){
+			} else if (tree[lvl][i].time > this.henAlgo.eventList.MAX_VALUE*0.5){
 				string += sprintf("%5s", "[+]");
 			} else {
 				string += sprintf("%5.1f", tree[lvl][i].time);
 			}
 			
 			if (i < tree[lvl].length-1) {
-				// string += this.getSpaceString(space);
 				string += this.getSpaceString(space);
 			}
 		}
 		
 		// add half after last
 		string += this.getSpaceString((1/2) * space);
-		// string += this.getSpaceString(space);
 
 		// add newline
 		string += "\n";
