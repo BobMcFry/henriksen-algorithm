@@ -53,8 +53,9 @@ var HenAlgorithmOut = function( henAlgorithm ) {
 
 }
 
-HenAlgorithmOut.prototype.NODESPACE = 5;
-HenAlgorithmOut.prototype.BOTTOMSPACE = 3;
+HenAlgorithmOut.prototype.NODESPACE = 2;
+HenAlgorithmOut.prototype.FLOATSPACE = 0;
+HenAlgorithmOut.prototype.BOTTOMSPACE = 1;
 
 
 HenAlgorithmOut.prototype.notify = function() {
@@ -65,12 +66,25 @@ HenAlgorithmOut.prototype.getStringRepresentation = function() {
 
 	var tree = this.henTreeOut.getTree();
 	var list = this.listOut.getList();
+	var listString = "";
 	var string = "";
+
+
+	// LIST of notices
+	listString += "[-]"
+	listString += this.getBottomSpaceString();
+
+	for (var i = 1; i < list.length-1; i++) {
+		listString += sprintf("%"+this.NODESPACE+"."+this.FLOATSPACE+"f", list[i].time);
+		listString += this.getBottomSpaceString();
+	}
+	listString += "[+]"
+
 
 	// TREE
 	var height = tree.length;
 	var noOfLeafs = tree[height-1].length;
-	var treeWidth = noOfLeafs * this.NODESPACE + (noOfLeafs - 1) * this.BOTTOMSPACE;
+	var treeWidth = listString.length;
 	var space;
 
 	for (var lvl = 0; lvl < height; lvl++) {
@@ -84,11 +98,11 @@ HenAlgorithmOut.prototype.getStringRepresentation = function() {
 		for (var i = 0; i < tree[lvl].length; i++) {
 			// TODO: make this sprintf dependent on NODESPACE!
 			if (tree[lvl][i].time < this.henAlgo.eventList.MIN_VALUE*0.5) {
-				string += sprintf("%5s", "[-]");
+				string += sprintf("%"+this.NODESPACE+"s", "[-]");
 			} else if (tree[lvl][i].time > this.henAlgo.eventList.MAX_VALUE*0.5){
-				string += sprintf("%5s", "[+]");
+				string += sprintf("%"+this.NODESPACE+"s", "[+]");
 			} else {
-				string += sprintf("%5.1f", tree[lvl][i].time);
+				string += sprintf("%"+this.NODESPACE+"."+this.FLOATSPACE+"f", tree[lvl][i].time);
 			}
 			
 			if (i < tree[lvl].length-1) {
@@ -105,19 +119,9 @@ HenAlgorithmOut.prototype.getStringRepresentation = function() {
 	}	
 
 	// between list and tree we need some space my dear.
-	string += "\n\n\n";
+	string += "\n";
 
-
-	// TODO: make length of bottom space depending on width at the bottom of tree.
-	// LIST of notices
-	string += "[-]"
-	string += this.getBottomSpaceString();
-
-	for (var i = 1; i < list.length-1; i++) {
-		string += sprintf("%5.2f", list[i].time);
-		string += this.getBottomSpaceString();
-	}
-	string += "[+]"
+	string += listString;
 
 	return string;
 
