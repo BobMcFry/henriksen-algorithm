@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Henricksens Algorithm</title>
+
+  </head>
+  <body onload="initialize();">
+
+    <script src="src/eventList.js"></script>
+    <script type="text/javascript">
+      function initialize() {
+        var algo = new HenAlgorithm();
+        algo.insert(1);
+        algo.toString();
+        algo.insert(2);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+        algo.insert(6);
+        algo.toString();
+        algo.insert(3);
+        algo.toString();
+        algo.insert(4);
+        algo.toString();
+        algo.insert(10);
+        algo.toString();
+        algo.insert(9);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+        algo.insert(1.5);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+        console.log("Popped: " + algo.next().time);
+        algo.toString();
+      }
+
+      function logg (string){
+        // console.log(string);
+      }
+    </script>
+  </body>
+</html>
