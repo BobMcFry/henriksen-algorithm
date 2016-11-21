@@ -1,68 +1,96 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+
     <title>Henricksens Algorithm</title>
+
+    <!-- Bootstrap -->
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
   </head>
   <body onload="initialize();">
+    <div class="container">
 
-  <div id="debugCon" style="font-family:Consolas,Monaco,Lucida Console,Courier New, monospace;">
-  </div>
+      <h1>Henriksens Algorithm <small>built by <a href="https://github.com/BobMcFry">BobMcFry</a></small></h1>
+      
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="input-group">
+            <input id="insert-input" type="text" class="form-control" placeholder="Number (time) to insert">
+            <span class="input-group-btn">
+              <button id="help-button" class="btn btn-default" type="button" data-toggle="tooltip" data-placement="bottom" title="Enter Integer time value greater than the current time (initially 0). Space separated lists of int values will be inserted from left to right.">?</button>
+              <button id="insert-button" class="btn btn-success" type="button">Insert</button>
+            </span>
+          </div>
+        </div>
+
+        <div class="col-lg-2">
+          <div class="input-group">
+            <button id="remove-button" type="button" class="btn btn-danger">Remove!</button>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="input-group">
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+
+
+    <div class="container">
+      <div id="debugCon" style="font-family:Consolas,Monaco,Lucida Console,Courier New, monospace;">
+      </div>
+    </div>
+
+
 
     <script src="src/eventList.js"></script>
     <script src="src/output.js"></script>
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.slim.min.js"></script>
+    <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="bower_components/sprintf/dist/sprintf.min.js"></script>
     <script type="text/javascript">
 
       function initialize() {
-        var algo = new HenAlgorithm();
-        var drawy = new HenAlgorithmOut(algo);
-        var values = [];
-        for (var i = 0; i < 99; i++) {
-          values.push(i);
-        }
+        algo = new HenAlgorithm();
+        drawy = new HenAlgorithmOut(algo);
+        $("#insert-button").on("click", insert);
+        $('#insert-input').keypress(function(e){
+          if(e.which == 13){
+              $('#insert-button').click();
+          }
+        });
+        $("#remove-button").on("click", remove);
+        $(function () {
+          $('[data-toggle="tooltip"]').tooltip()
+        })
+      }
 
-        values = shuffle(values);
-
-        // for (var i = 0; i < values.length; i++) {
-        for (var i = values.length-1; i >= 0; i--) {
-          algo.insert(values[i]);
-          debugCon("Inserted: " + values[i], drawy.getStringRepresentation());
-          // Removal
-          // if (!algo.isEmpty() && Math.random() > 0.7) {
-          //   var next = algo.next();
-          //   debugCon("Removed: " + next.time, drawy.getStringRepresentation());
-          // }
+      function insert() {
+        
+        var input = $("#insert-input").val().trim().match(/\S+/g) || [];
+        
+        for (var i = input.length - 1; i >= 0; i--) {
+          var no = Number.parseInt(input[i]);
+          var ret = algo.insert(no);
+          if (ret !== null) {
+            debugCon(sprintf("Inserted: %4d (current time: %6d)", no, algo.getCurrentTime()), drawy.getStringRepresentation());
+          }
         }
       }
 
-
-      // taken from: http://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array-in-javascript
-      function shuffle(array) {
-        let counter = array.length;
-
-        // While there are elements in the array
-        while (counter > 0) {
-            // Pick a random index
-            let index = Math.floor(Math.random() * counter);
-
-            // Decrease counter by 1
-            counter--;
-
-            // And swap the last element with it
-            let temp = array[counter];
-            array[counter] = array[index];
-            array[index] = temp;
+      function remove() {
+        var output = algo.next();
+        if (output !== null) {
+          debugCon(sprintf("Removed: %4d (current time: %6d)",output.time, algo.getCurrentTime()), drawy.getStringRepresentation());   
         }
-
-        return array;
       }
-
     </script>
   </body>
 </html>

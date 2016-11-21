@@ -8,6 +8,8 @@ var HenTreeOut = function( henAlgorithm ) {
 
 };
 
+
+
 HenTreeOut.prototype.getTree = function( ) {
 
 	var tree = this.henAlgorithm.henTree;
@@ -21,6 +23,7 @@ HenTreeOut.prototype.getTree = function( ) {
 };
 
 
+
 /* ################## */
 /* ~~~~ LIST_OUT ~~~~ */
 /* ################## */
@@ -30,6 +33,8 @@ var ListOut = function( henAlgorithm ) {
 	this.henAlgorithm = henAlgorithm;	
 
 };
+
+
 
 ListOut.prototype.getList = function( ) {
 	
@@ -45,6 +50,7 @@ ListOut.prototype.getList = function( ) {
 }
 
 
+
 var HenAlgorithmOut = function( henAlgorithm ) {
 	
 	this.henAlgo = henAlgorithm;
@@ -53,14 +59,13 @@ var HenAlgorithmOut = function( henAlgorithm ) {
 
 }
 
+
+
 HenAlgorithmOut.prototype.NODESPACE = 2;
 HenAlgorithmOut.prototype.FLOATSPACE = 0;
 HenAlgorithmOut.prototype.BOTTOMSPACE = 1;
 
 
-HenAlgorithmOut.prototype.notify = function() {
-	// TODO: this function is used when the model changes, observer and so on.
-};
 
 HenAlgorithmOut.prototype.getStringRepresentation = function() {
 
@@ -84,6 +89,8 @@ HenAlgorithmOut.prototype.getStringRepresentation = function() {
 	return treeString;
 
 }
+
+
 
 HenAlgorithmOut.prototype.getTreeStringRepresentation = function(width) {
 
@@ -189,18 +196,24 @@ HenAlgorithmOut.prototype.getTreeStringRepresentation = function(width) {
 
 };
 
+
+
 HenAlgorithmOut.prototype.replaceAt = function(string, index, characters) {
     return string.substring(0, index) + characters + string.substring(index+characters.length);
 }
+
+
 
 HenAlgorithmOut.prototype.getBottomSpaceString = function() {
 	return this.getSymbolString(this.BOTTOMSPACE, " ");
 };
 
 
+
 HenAlgorithmOut.prototype.getSpaceString = function(no) {
 	return this.getSymbolString(no, " ");
 };
+
 
 
 HenAlgorithmOut.prototype.getSymbolString = function(length, symbol) {
@@ -211,15 +224,21 @@ HenAlgorithmOut.prototype.getSymbolString = function(length, symbol) {
 };
 
 
+
 function logg (obj){
 // console.log(obj);
 // debugCon(obj);
 }
 
+
+
 var debugCnt = 1;
 function debugCon (title, obj){
-// $('#debugCon').text($('#debugCon').text() + obj);
-// $('#debugCon').text($('#debugCon').text() + "<b>");
-$('#debugCon').append("<p>"+ (debugCnt++) + ": "  +title +  "</p>");
-$('#debugCon').append("<pre>"+obj+ "</pre>");
+	
+	// $('#debugCon').text($('#debugCon').text() + obj);
+	// $('#debugCon').text($('#debugCon').text() + "<b>");
+	$('#debugCon').prepend("<pre>"+obj+ "</pre>");
+	$('#debugCon').prepend("<p>"+ (debugCnt++) + ": "  +title +  "</p>");
+	$('#debugCon').prepend("<br><br>");
+
 }

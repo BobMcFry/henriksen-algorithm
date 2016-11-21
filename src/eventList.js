@@ -12,6 +12,8 @@ var EventNotice = function( time, data=null ) {
 
 };
 
+
+
 // clears all references to and from(!) other nodes and notices. Will be called from inside here.
 EventNotice.prototype.clearAllReferences = function( ) {
 	
@@ -26,7 +28,7 @@ EventNotice.prototype.clearAllReferences = function( ) {
 };
 
 
-// TODO: Does that find the HenNodes? IndexOf?
+
 // Clears the reference to a particular HenNode. Will be called from outside.
 EventNotice.prototype.clearReference = function( henNode ) {
 	
@@ -38,6 +40,8 @@ EventNotice.prototype.clearReference = function( henNode ) {
 	}
 
 };
+
+
 
 EventNotice.prototype.addReference = function( henNode ) {
 	this.externalReferences.push(henNode);
@@ -51,7 +55,6 @@ EventNotice.prototype.addReference = function( henNode ) {
 /* ################### */
 /* ~~~~ EVENTLIST ~~~~ */
 /* ################### */
-
 
 var EventList = function() {
 
@@ -67,10 +70,11 @@ var EventList = function() {
 
 };
 
+
+
 EventList.prototype.MIN_VALUE = -Number.MAX_VALUE;
 EventList.prototype.MAX_VALUE = Number.MAX_VALUE;
-// EventList.prototype.MIN_VALUE = -100;
-// EventList.prototype.MAX_VALUE = +100;
+
 
 
 EventList.prototype.insertAfter = function( afterThisNode, eventNotice ) {
@@ -95,6 +99,7 @@ EventList.prototype.insertAfter = function( afterThisNode, eventNotice ) {
 };
 
 
+
 EventList.prototype.next = function() {
 
 	if ( this.isEmpty() ) {
@@ -115,15 +120,16 @@ EventList.prototype.next = function() {
 };
 
 
+
 EventList.prototype.isEmpty = function( ) {
 	return this.noOfElements == 0;
 };
 
 
+
 EventList.prototype.remove = function() {
 
 	if (this.isEmpty()) {
-		// TODO: think about the console.log output things...maybe find a nicer solution...
 		console.log("Error: Cannot remove element of an empty list.")
 		return null;
 	}
@@ -157,6 +163,8 @@ var HenNode = function(eventNotice,
 
 }
 
+
+
 // clears only this eventPointer (will be called from outside)
 // NOTE regarding the clearing of times: see clearBothReferences note section.
 HenNode.prototype.clearReference = function() {
@@ -164,6 +172,8 @@ HenNode.prototype.clearReference = function() {
 	this.eventPointer = null;
 
 };
+
+
 
 // clears both references of HenNode and EventNotice. Will be calles from inside here.
 // NOTE: times are not being removed from the tree, as they are necessary for not 
@@ -197,7 +207,7 @@ var HenTree = function( maxNotice ) {
 }
 
 
-// TODO: test
+
 HenTree.prototype.addLayer = function( minNotice, maxNotice ) {
 	
 	// see below
@@ -205,19 +215,9 @@ HenTree.prototype.addLayer = function( minNotice, maxNotice ) {
 	var currentLeafs = this.getLeafs();
 
 	for (var i = 0; i < currentLeafs.length; i++) {
+		
 		currentNode = currentLeafs[i];
-		// TODO: THIS WAS THE ORIGINAL IMPLEMENTATION USED IN THE PAPER.
-		// if ( isFirstSet ) { // regular nodes point to the minNotice
-		// 	currentNode.leftSon = new HenNode( minNotice );
-		// } else { // the very left node points to the max notice
-		// 	currentNode.leftSon = new HenNode( maxNotice );
-		// 	isFirstSet = true;
-		// }
-		// // regular nodes point to the minNotice
-		// currentNode.rightSon = new HenNode( minNotice );
 
-
-		// TODO: HERE IS THE ALTERNATIVE VERSION:
 		currentNode.leftSon = new HenNode( minNotice );
 		if ( i == currentLeafs.length - 1 ) {
 			currentNode.clearBothReferences()
@@ -278,7 +278,7 @@ HenTree.prototype.addLayer = function( minNotice, maxNotice ) {
 };
 
 
-// TODO: test this thing
+
 HenTree.prototype.getHeight = function() {
 	
 	var cnt;
@@ -291,8 +291,9 @@ HenTree.prototype.getHeight = function() {
 
 };
 
+
+
 // lvl starts from 0!
-// TODO: test
 HenTree.prototype.getNoNodesOnLvl = function( lvl ) {
 	
 	return Math.pow(2,lvl);
@@ -300,8 +301,7 @@ HenTree.prototype.getNoNodesOnLvl = function( lvl ) {
 };
 
 
-// TODO: test
-// TODO: needed?
+
 // lvl starts from 0!
 HenTree.prototype.getNoNodes = function( ) {
 	
@@ -316,7 +316,7 @@ HenTree.prototype.getNoNodes = function( ) {
 };
 
 
-// TODO: test
+
 HenTree.prototype.getNodes = function( lvl ) {
 	
 	// if height is smaller than asked for row print out an error.
@@ -355,20 +355,16 @@ HenTree.prototype.getNodes = function( lvl ) {
 };
 
 
+
 HenTree.prototype.getLeafs = function() {
 	
 	return this.getNodes( this.getHeight() - 1 );
 
 };
 
-
-
-// GLOBAL TODO: maybe create funciton for setting hennode to certain eventnotice...!?
-
-
 // GLOBAL TODO: if times are equal make it FIFO!!!
 
-// TODO: actually a simulation cloock needs to be updated inside of HenAlgorithm...but i guess i can just set a switch such that it will also work as fifo simply.
+
 
 /* ###################### */
 /* ~~~~ HENALGORITHM ~~~~ */
@@ -378,18 +374,26 @@ var HenAlgorithm = function() {
 
 	this.eventList = new EventList();
 	this.henTree = new HenTree(this.eventList.tail);
+	this.currentTime = 0;
 
 }
+
+
 
 HenAlgorithm.prototype.MAXSEARCH = 4;
 
 
+
 HenAlgorithm.prototype.insert = function( time, data ) {
+
+	if (time < this.currentTime ) {
+		console.log(sprintf("Error: cannot enter time < than the current time (=%6.2f).", this.currentTime));
+		return null;
+	}
 
 	var eventNotice = new EventNotice( time, data );
 	var pullResult = null;
 	var resultInsert = null;
-	// TODO: assert that time is greater than current! (first...add it later to be able to work as a fifo simply.)
 	var smallestGreaterNode = this.getSmallestGreater( eventNotice.time );
 
 	while (true) {
@@ -402,7 +406,7 @@ HenAlgorithm.prototype.insert = function( time, data ) {
 
 		if ( resultInsert === null ) {
 
-			return;
+			return eventNotice;
 
 		} else {
 			
@@ -421,9 +425,11 @@ HenAlgorithm.prototype.insert = function( time, data ) {
 
 	// if break out of the loop we added a new layer. Otherwise we will directly return.
 	// So with this new layer try to insert again.
-	this.insert( eventNotice.time, eventNotice.data );
+	return this.insert( eventNotice.time, eventNotice.data );
 	
 };
+
+
 
 // Removes the most imminent element from the EventList, unless the list is empty. 
 // It will return the EventNotice wihtout any in or outgoing references.
@@ -433,14 +439,15 @@ HenAlgorithm.prototype.next = function() {
 
 	if ( ret === null ) {
 
-		// TODO: think about the console.log output things...maybe find a nicer solution...
 		console.log("Error: Cannot remove element of an empty list.")
 		return null;
 
 	}
 
-	// TODO: maybe put them in HenAlgorithm since they refer to both list and tree...reduce coupling jesuuuss.
 	ret.clearAllReferences();
+
+	// adapt the time of the data structure
+	this.currentTime = ret.time;
 
 	return ret;
 
@@ -469,7 +476,8 @@ HenAlgorithm.prototype.pull = function( originHenNode, toEventNotice ) {
 
 };
 
-// TODO: test...
+
+
 // returns the HenNode that is the one with a time that is the smallest 
 // one yet still greater than the input time. Important to return the
 // complete HenNode, since we may need it for finding the lext lower node
@@ -480,13 +488,6 @@ HenAlgorithm.prototype.getSmallestGreater = function( time ) {
 	var candidate = null;
 	var notFound = true;
 
-	// TODO: think about the situation that eventPointer are null or point to a 
-	//       thing that is not in order!! maybe due to deletion before they point 
-	//       to the plus infty thing...
-	// --> I dont think that this is a realistic thing to happen. But being not
-	//     completely sure about that, i will leave that here.
-	
-	// TODO: think about leq stuff
 	while ( notFound ) {
 
 		if ( currentNode.time <= time ) {
@@ -518,13 +519,19 @@ HenAlgorithm.prototype.getSmallestGreater = function( time ) {
 
 };
 
+
+
 // It will try to insert with maxsearch amount of lookups. if successful null will be returned. 
 // If not successful the last watched node will be returned in order to perform a pull operation.
 HenAlgorithm.prototype.tryInsert = function( what, start, maxSearch ) {
 
     var currentNotice = start.eventPointer;
 
-    // TODO: check amount of iterations if it is correct.
+    if (start.eventPointer == null) {
+    	console.log("Error: Trying to insert event before current time is very likely.")
+    }
+
+    // TODO: check if amount of iterations is correct.
     for (var i = 0; i <= maxSearch; i++) {
 
     	currentNotice = currentNotice.prev;
@@ -542,12 +549,16 @@ HenAlgorithm.prototype.tryInsert = function( what, start, maxSearch ) {
 
 };
 
+
+
 HenAlgorithm.prototype.toString = function( ) {
 
 	// return debugging visualisation of tree and list
 	this.getListOfEventTimes();
 
 };
+
+
 
 HenAlgorithm.prototype.getListOfEventTimes = function( ) {
 	
@@ -565,7 +576,16 @@ HenAlgorithm.prototype.getListOfEventTimes = function( ) {
 
 };
 
+
+
 HenAlgorithm.prototype.isEmpty = function() {
 	return this.eventList.isEmpty();
 };
+
+
+
+HenAlgorithm.prototype.getCurrentTime = function() {
+	return this.currentTime;
+};
+
 
