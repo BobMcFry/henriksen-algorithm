@@ -1,6 +1,6 @@
 # Henriksens Algorithm
 
-This web application visualizes Henriksens Algorithm [henriksen-paper] which is a data structure useful for next-event simulations. The data structure is composed of a doubly linked list that carries a binary tree on top of it which is used as a dynamic index of that list. The list is always sorted by the event times of its elements. The tree is used to insert new events at their correct position in the list with a runtime of O(log n) instead of O(n).
+This web application visualizes [Henriksens Algorithm][henriksen-paper] which is a data structure useful for next-event simulations. The data structure is composed of a doubly linked list that carries a binary tree on top of it which is used as a dynamic index of that list. The list is always sorted by the event times of its elements. The tree is used to insert new events at their correct position in the list with a runtime of O(log n) instead of O(n).
 
 App in Action: [Link to github pages will be here soon...] 
 
