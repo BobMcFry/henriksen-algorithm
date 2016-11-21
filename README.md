@@ -4,7 +4,7 @@ This web application visualizes [Henriksens Algorithm][henriksen-paper] which is
 
 App in Action: [Link to github pages will be here soon...] 
 
-The algorithm was written in Javascript and follows the paper ["Event List Management - A Tutorial"][henriksen-paper] and an [implementation in C][henriksen-c] by [Christopher Copper][https://github.com/ccopper].
+The algorithm was written in Javascript and follows the paper ["Event List Management - A Tutorial"][henriksen-paper] and an [implementation in C][henriksen-c] by [Christopher Copper](https://github.com/ccopper).
 
 
 ## Credits
